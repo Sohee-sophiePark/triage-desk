@@ -44,7 +44,7 @@ async def test_customer_metrics_have_no_names_or_contacts(db, make_incident):
     assert m["kyc_status"].value == "expired"
     assert m["credit_score"].value == 610
     dumped = str({k: v.model_dump() for k, v in m.items()})
-    assert "Agent" not in dumped and "@test.com" not in dumped
+    assert "Agent" not in dumped and "@example.com" not in dumped
 
 
 # ── rules ─────────────────────────────────────────────────────────────────────

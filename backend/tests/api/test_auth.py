@@ -25,7 +25,7 @@ async def test_login_wrong_password(client, admin_user):
 async def test_login_unknown_user(client):
     r = await client.post(
         "/api/v1/auth/login",
-        data={"username": "nobody@test.com", "password": WRONG_PASSWORD},
+        data={"username": "nobody@example.com", "password": WRONG_PASSWORD},
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
     assert r.status_code == 400

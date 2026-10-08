@@ -45,7 +45,7 @@ async def test_list_users_requires_auth(client):
 async def test_create_user_admin(client, admin_headers):
     unique = uuid.uuid4().hex[:8]
     payload = {
-        "email": f"newuser-{unique}@test.com",
+        "email": f"newuser-{unique}@example.com",
         "password": TEST_PASSWORD,
         "full_name": "New Test User",
         "role": "risk_analyst",
@@ -65,7 +65,7 @@ async def test_create_user_admin(client, admin_headers):
 async def test_create_user_duplicate_email(client, admin_headers):
     unique = uuid.uuid4().hex[:8]
     payload = {
-        "email": f"dup-{unique}@test.com",
+        "email": f"dup-{unique}@example.com",
         "password": TEST_PASSWORD,
         "full_name": "First",
         "role": "admin",
@@ -79,7 +79,7 @@ async def test_create_user_duplicate_email(client, admin_headers):
 
 async def test_create_user_forbidden_for_analyst(client, analyst_headers):
     payload = {
-        "email": "nobody@test.com",
+        "email": "nobody@example.com",
         "password": TEST_PASSWORD,
         "full_name": "Nobody",
         "role": "admin",
@@ -89,7 +89,7 @@ async def test_create_user_forbidden_for_analyst(client, analyst_headers):
 
 
 async def test_create_user_missing_fields(client, admin_headers):
-    r = await client.post("/api/v1/users", json={"email": "incomplete@test.com"}, headers=admin_headers)
+    r = await client.post("/api/v1/users", json={"email": "incomplete@example.com"}, headers=admin_headers)
     assert r.status_code == 422
 
 
@@ -99,7 +99,7 @@ async def test_create_user_missing_fields(client, admin_headers):
 async def created_user_id(client, admin_headers):
     unique = uuid.uuid4().hex[:8]
     payload = {
-        "email": f"patch-target-{unique}@test.com",
+        "email": f"patch-target-{unique}@example.com",
         "password": TEST_PASSWORD,
         "full_name": "Patch Target",
         "role": "risk_analyst",
@@ -154,7 +154,7 @@ async def test_create_user_short_password_rejected(client, admin_headers):
     r = await client.post(
         "/api/v1/users",
         json={
-            "email": "short-pw@test.com",
+            "email": "short-pw@example.com",
             "password": "Short1!",
             "full_name": "Bad",
             "role": "risk_analyst",
@@ -168,7 +168,7 @@ async def test_create_user_no_uppercase_rejected(client, admin_headers):
     r = await client.post(
         "/api/v1/users",
         json={
-            "email": "noup@test.com",
+            "email": "noup@example.com",
             "password": "alllowercase1!",
             "full_name": "Bad",
             "role": "risk_analyst",
@@ -182,7 +182,7 @@ async def test_create_user_no_digit_rejected(client, admin_headers):
     r = await client.post(
         "/api/v1/users",
         json={
-            "email": "nodigit@test.com",
+            "email": "nodigit@example.com",
             "password": "NoDigitHere!!X",
             "full_name": "Bad",
             "role": "risk_analyst",
@@ -196,7 +196,7 @@ async def test_create_user_no_special_char_rejected(client, admin_headers):
     r = await client.post(
         "/api/v1/users",
         json={
-            "email": "nospecial@test.com",
+            "email": "nospecial@example.com",
             "password": "NoSpecialChar1A",
             "full_name": "Bad",
             "role": "risk_analyst",
@@ -211,7 +211,7 @@ async def test_create_user_valid_complex_password(client, admin_headers):
     r = await client.post(
         "/api/v1/users",
         json={
-            "email": f"goodpw-{unique}@test.com",
+            "email": f"goodpw-{unique}@example.com",
             "password": TEST_PASSWORD,
             "full_name": "Good",
             "role": "risk_analyst",

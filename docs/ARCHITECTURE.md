@@ -2,62 +2,64 @@
 
 Quick reference. The agent pipeline is described in [`AGENT_ARCHITECTURE.md`](AGENT_ARCHITECTURE.md).
 
-## System Layers (top to bottom)
+## System layers (top to bottom)
 
-1. **Presentation Layer** — React SPA (Vite + TS + Tailwind + shadcn/ui)
-2. **API Gateway** — FastAPI with JWT auth, RBAC, rate limiting, audit logging
-3. **Security Layer** — PII redaction on every LLM call, prompt-injection defense (multi-layer)
-4. **Workflow Engine** — Case lifecycle state machine, review queue, automation rules
-5. **Agent Orchestration** — LangGraph graph with typed state
-6. **Agent Pool** — Triage router, Transaction / Customer / Compliance specialists, Writer, Compliance Guardian (code), Evaluator
-7. **Data Access** — SQLAlchemy 2.0 async ORM
-8. **Storage** — SQLite/PostgreSQL + ChromaDB + Redis
+1. **Presentation** — React 18 SPA (Vite, TypeScript, Tailwind, Radix primitives). A demo build (`VITE_DEMO=1`) reads
+   exported JSON instead of the API and replaces login with a persona switcher.
+2. **API** — FastAPI with JWT auth, role-based access (4 roles), in-memory rate limiting, account lockout.
+3. **Security** — PII patterns redacted on every LLM call; alert text wrapped as untrusted data; deterministic output gates.
+4. **Workflow engine** — case lifecycle (below) and the append-only audit trail.
+5. **Agent orchestration** — one LangGraph graph per case with typed state.
+6. **Agents** — triage router; transaction, customer and compliance specialists; single writer; evaluator.
+   Breach rules, the output gates (the "Compliance Guardian") and final status are code, not agents.
+7. **Data access** — SQLAlchemy 2.0 async ORM, Alembic migrations.
+8. **Storage** — SQLite (local and demo) or PostgreSQL (Docker Compose). The Compose file also provisions Redis and
+   ChromaDB containers; the current app does not use them.
 
-## Request Lifecycle
+## Request lifecycle
 
 ```
-Client Request
-  → JWT Validation + RBAC Check
+Client request
+  → JWT validation + role check
   → Case graph (see AGENT_ARCHITECTURE.md):
-      intake (code metrics, flags) → triage → parallel specialists → writer
-      → Compliance Guardian gates (code) ⇄ evaluator (bounded revisions) → finalize
-  → Workflow Engine (PENDING_REVIEW or ESCALATED)
-  → Human Review (approve / reject / escalate)
-  → Audit Trail (append-only record)
+      intake (code: metrics, flags) → triage → parallel specialists → writer
+      → guardian gates (code) ⇄ evaluator (at most 2 revisions) → finalize
+  → Case status PENDING_REVIEW, or ESCALATED with "needs supervisor review"
+  → Human decision (approve / reject / escalate, written reasoning required)
+  → Audit trail (append-only)
 ```
 
-## Case State Machine
+## Case lifecycle
 
 ```
-CREATED → AI_PROCESSING → AI_EVALUATED → PENDING_REVIEW → IN_REVIEW → HUMAN_DECIDED → CLOSED
-                                                                    ↘ ESCALATED ↗
+CREATED → AI_PROCESSING → PENDING_REVIEW ── approve / reject ──► HUMAN_DECIDED
+                        ↘ ESCALATED (loop exhausted)  ↘ escalate ──► ESCALATED
 ```
 
-## Agent State
+## Roles
 
-Agents share one typed LangGraph state, `CaseState` (`backend/app/agents/state.py`): case input,
-code-computed metrics, evidence and flags, the plan, specialist findings (merged in parallel), the draft,
-gate failures, evaluator verdict, revision count, final status and a node trace.
+| Role | Sees | Can |
+|---|---|---|
+| admin (Ops Supervisor in the demo) | all cases, users, audit | create and evaluate cases, decide, manage users |
+| risk_analyst | all cases | create and evaluate cases, decide |
+| fraud_investigator | fraud cases | decide |
+| compliance_officer | compliance cases | decide |
 
-## Database Entities
+## Agent state
 
-customers, accounts, product_holdings, transactions, risk_incidents, workflow_cases, evaluation_log, audit_trail, product_catalog
+Agents share one typed LangGraph state, `CaseState` (`backend/app/agents/state.py`): case input, code-computed
+metrics, evidence and flags, the plan, specialist findings (merged in parallel), the draft, gate failures, evaluator
+verdict, revision count, final status and a node trace.
 
-## API Response Envelope
+## Database entities
 
-```json
-{
-  "status": "success|error",
-  "data": {},
-  "meta": { "timestamp": "", "request_id": "", "agent_metadata": {} }
-}
-```
+customers, accounts, transactions, product_holdings, product_catalog, risk_incidents, workflow_cases, audit_trails, users
 
-## Automation Levels
+## API responses
 
-| Level | Description |
-|-------|-------------|
-| 0 (default) | Human reviews all cases — no automation |
-| 1 | Low-severity, high-confidence cases auto-advance; human notified |
-| 2 | High-risk cases always reviewed; others auto-advance |
-| 3 | Spot-check sampling only |
+Customer and analytics endpoints use the envelope `{ "status", "data", "meta" }`. Workflow endpoints return the case,
+case list or `{ "case_id", "audit_trail" }` directly.
+
+---
+
+_Last updated 2026-10-08 · checked against the code (models, routes, workflow service) and the 177-test suite._

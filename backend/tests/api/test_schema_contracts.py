@@ -44,7 +44,7 @@ async def seeded_customer(db):
         first_name="Schema",
         last_name="TestUser",
         date_of_birth=date(1985, 6, 15),
-        email=f"schema-{uuid.uuid4().hex[:6]}@test.com",
+        email=f"schema-{uuid.uuid4().hex[:6]}@example.com",
         income_bracket=IncomeBracket.medium,
         credit_score=720,
         risk_tolerance=RiskTolerance.moderate,

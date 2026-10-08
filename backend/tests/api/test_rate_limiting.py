@@ -32,7 +32,7 @@ async def anon_client():
 async def test_login_rate_limit_blocks_on_threshold(anon_client):
     """6th login attempt from the same IP must return 429."""
     max_attempts = settings.RATE_LIMIT_LOGIN_MAX
-    payload = {"username": "nobody@test.com", "password": WRONG_PASSWORD}
+    payload = {"username": "nobody@example.com", "password": WRONG_PASSWORD}
 
     for _ in range(max_attempts):
         r = await anon_client.post("/api/v1/auth/login", data=payload)
@@ -46,7 +46,7 @@ async def test_login_rate_limit_blocks_on_threshold(anon_client):
 @pytest.mark.asyncio
 async def test_login_rate_limit_includes_retry_after(anon_client):
     max_attempts = settings.RATE_LIMIT_LOGIN_MAX
-    payload = {"username": "nobody@test.com", "password": WRONG_PASSWORD}
+    payload = {"username": "nobody@example.com", "password": WRONG_PASSWORD}
 
     for _ in range(max_attempts + 1):
         r = await anon_client.post("/api/v1/auth/login", data=payload)

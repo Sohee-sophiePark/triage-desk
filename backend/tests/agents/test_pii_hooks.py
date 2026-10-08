@@ -18,8 +18,8 @@ def test_email_in_sentence_redacted():
 
 
 def test_email_subdomain_redacted():
-    result = sanitize_llm_output("user@mail.bank.com is flagged.")
-    assert "user@mail.bank.com" not in result
+    result = sanitize_llm_output("user@mail.example.com is flagged.")
+    assert "user@mail.example.com" not in result
     assert "[PII_REDACTED]" in result
 
 
@@ -42,9 +42,9 @@ def test_ssn_redacted():
 
 
 def test_multiple_pii_types_in_one_string():
-    text = "Customer john@bank.com with SSN 111-22-3333 called 800-555-0100."
+    text = "Customer john@example.com with SSN 111-22-3333 called 800-555-0100."
     result = sanitize_llm_output(text)
-    assert "john@bank.com" not in result
+    assert "john@example.com" not in result
     assert "111-22-3333" not in result
     assert result.count("[PII_REDACTED]") >= 2
 

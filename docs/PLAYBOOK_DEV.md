@@ -71,8 +71,8 @@ Services started:
 | frontend (nginx) | :80 | Serves React SPA, proxies /api/ |
 | backend (FastAPI) | :8000 | Gunicorn + Uvicorn workers |
 | postgres | :5432 | Named volume `pgdata` |
-| redis | :6379 | Named volume `redisdata` |
-| chromadb | internal | Named volume `chromadata` |
+| redis | :6379 | Named volume `redisdata` (provisioned; not used by the current app) |
+| chromadb | internal | Named volume `chromadata` (provisioned; not used by the current app) |
 
 ### First-time setup after `make up`
 
@@ -100,7 +100,6 @@ make prod                # 2 backend replicas, resource limits enforced
 
 ```bash
 make down                # stop all containers
-make logs                # docker compose logs -f backend
 make clean               # stop + delete all volumes (destructive)
 make build-clean         # full image rebuild (--no-cache)
 ```
@@ -128,7 +127,13 @@ docker compose exec backend uv run alembic upgrade head
 
 ## 5. Seed Data
 
-The seed scripts are dev-only (guarded by `ENVIRONMENT=development` check):
+Generate synthetic customers, transactions and incidents first (needs the dev dependencies, including numpy):
+
+```bash
+cd backend && PYTHONPATH=. uv run python ../data/generator/generate.py --customers 500 --seed 42 --output ../data/seed.db
+```
+
+Then seed dev users and workflow cases. The seed scripts are dev-only (guarded by `ENVIRONMENT=development`):
 
 ```bash
 # Local
@@ -167,19 +172,35 @@ The `uv.lock` file is committed to git — it is the source of truth for exact t
 | POST | `/api/v1/auth/login` | Public | JWT login |
 | GET | `/api/v1/customers` | All roles | Customer list |
 | GET | `/api/v1/workflow/cases` | All roles (scoped) | Case queue |
-| POST | `/api/v1/workflow/cases/{incident_id}` | All roles | Create case from incident |
-| POST | `/api/v1/workflow/cases/{id}/evaluate` | All roles | Trigger AI evaluation |
-| POST | `/api/v1/workflow/cases/{id}/decide` | All roles | Submit human decision |
+| POST | `/api/v1/workflow/cases/{incident_id}` | admin, risk_analyst | Create case from incident |
+| POST | `/api/v1/workflow/cases/{id}/evaluate` | admin, risk_analyst | Run the case graph |
+| POST | `/api/v1/workflow/cases/{id}/decide` | All roles (scoped) | Submit human decision |
+| GET | `/api/v1/workflow/cases/{id}/audit` | All roles (scoped) | Case audit trail |
 | GET | `/api/v1/users` | admin only | List all users |
 | POST | `/api/v1/users` | admin only | Create user |
 | PATCH | `/api/v1/users/{id}` | admin only | Update user |
-| GET | `/api/v1/analytics/summary` | All roles | Aggregated portfolio + case metrics |
+| GET | `/api/v1/analytics/summary` | Any signed-in user | Aggregated case, incident and customer metrics |
 
 All endpoints are rate-limited. Login has stricter per-IP limits than authenticated endpoints.
 
 ---
 
-## 8. Troubleshooting
+## 8. Replay Demo and Recording
+
+```bash
+cd backend
+uv run python -m demo.export            # replay demo/cassette.jsonl into frontend/public/demo/ (no key)
+uv run python -m demo.export --record   # re-run the 8 demo cases live (free-tier Gemini, GEMINI_API_KEY in .env)
+cd ../frontend && VITE_DEMO=1 VITE_BASE=/triage-desk/ npm run build
+```
+
+Replay fails if any demo case has no recording, so a prompt change that alters a request requires `--record`.
+LLM settings live in `backend/app/agents/config.py`: free-tier model fallback order (`MODELS`), timeout, token cap,
+revision limit and evaluator pass score.
+
+---
+
+## 9. Troubleshooting
 
 **Port 8000 already in use (local dev):**
 Use `--port 8001` for uvicorn and update `frontend/vite.config.ts` proxy target accordingly.
@@ -192,3 +213,7 @@ Run `uv run alembic upgrade head` (local) or `make migrate-docker`.
 
 **Empty dashboards after login:**
 Run `make seed` (local) or `make seed-docker` to populate workflow cases.
+
+---
+
+_Last updated 2026-10-08 · commands checked against the Makefile, routes and `demo/export.py`._

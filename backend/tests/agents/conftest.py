@@ -20,7 +20,7 @@ def make_incident(db):
         tag = uuid.uuid4().hex[:8]
         customer = Customer(
             id=uuid.uuid4(), external_id=f"AG-{tag}", first_name="Agent", last_name="Test",
-            date_of_birth=date(1980, 1, 1), email=f"agent-{tag}@test.com", income_bracket=IncomeBracket.medium,
+            date_of_birth=date(1980, 1, 1), email=f"agent-{tag}@example.com", income_bracket=IncomeBracket.medium,
             credit_score=credit, risk_tolerance=RiskTolerance.moderate, segment=Segment.mass,
             kyc_status=KYCStatus(kyc),
         )

@@ -72,13 +72,22 @@ payload, sends it, and validates the JSON against the node's Pydantic schema.
 
 | Mode (`LLM_MODE`) | Client | Use |
 |---|---|---|
-| `live` | `LiveClient` — async LiteLLM, Gemini free tier, falls back down `MODELS` (free-tier only: 3.8 Flash → … → 2.5 Flash-Lite) on quota, unavailable, access or retired-model errors | laptop with a key |
+| `live` | `LiveClient` — async LiteLLM, Gemini free tier only. Tries `MODELS` newest first (3.8 Flash → … → 2.5 Flash-Lite) and moves to the next on rate-limit, quota, unavailable, access, bad-request, retired-model or timeout (60 s) errors; an auth error stops. The serving model is recorded in the trace | laptop with a key |
 | `record` | `CassetteClient` wrapping live, appends to `CASSETTE_PATH` | recording demo scenarios |
 | `replay` | `CassetteClient`, recorded responses only | public demo, CI — no key |
 | tests | `ScriptedClient` — canned responses per node | unit and graph tests |
 
 Cassette keys hash purpose, system prompt and payload, excluding the per-run canary line. Each system
-prompt carries a fresh canary; G4/G5 reject any output that contains it.
+prompt carries a fresh canary; G4/G5 reject any output that contains it. Output is capped at 8,192 tokens,
+leaving room for thinking models to finish the JSON answer.
+
+## 4a. Replay demo
+
+`backend/demo/export.py` builds eight fictional cases (one per scenario: routine alert, velocity spike, account
+takeover, structuring, expired KYC, alert-text injection, credit breach, identity theft) plus background customers,
+runs each through the graph, and exports every API response the UI reads as JSON. `--record` runs the cases live and
+writes `backend/demo/cassette.jsonl`; without it the export replays the cassette and fails if any recording is missing.
+The Pages workflow replays, builds the frontend with `VITE_DEMO=1` and deploys.
 
 ## 5. Stored result
 
@@ -101,3 +110,7 @@ audit trail; no endpoint updates or deletes audit rows.
 | New flag or threshold | `rules.evaluate_flags` + a boundary test |
 | New specialist | `tools.SLICES`, a prompt YAML in `agents/prompts/`, `Literal` in `TriageOut` |
 | New output check | `gates.output_gate` + a test in `tests/agents/test_gates_llm.py` |
+
+---
+
+_Last updated 2026-10-08 · checked against `backend/app/agents/` and the 177-test suite._

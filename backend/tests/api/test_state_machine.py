@@ -27,7 +27,7 @@ async def sm_incident(db):
         first_name="StateMachine",
         last_name="Test",
         date_of_birth=date(1990, 1, 1),
-        email=f"sm-{uuid.uuid4().hex[:8]}@test.com",
+        email=f"sm-{uuid.uuid4().hex[:8]}@example.com",
         income_bracket=IncomeBracket.medium,
         credit_score=680,
         risk_tolerance=RiskTolerance.moderate,

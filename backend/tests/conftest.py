@@ -129,17 +129,17 @@ async def _make_user(db: AsyncSession, email: str, role: Role) -> User:
 
 @pytest.fixture(scope="session")
 async def admin_user(db):
-    return await _make_user(db, "admin@test.com", Role.ADMIN)
+    return await _make_user(db, "admin@example.com", Role.ADMIN)
 
 
 @pytest.fixture(scope="session")
 async def analyst_user(db):
-    return await _make_user(db, "analyst@test.com", Role.RISK_ANALYST)
+    return await _make_user(db, "analyst@example.com", Role.RISK_ANALYST)
 
 
 @pytest.fixture(scope="session")
 async def investigator_user(db):
-    return await _make_user(db, "investigator@test.com", Role.INVESTIGATOR)
+    return await _make_user(db, "investigator@example.com", Role.INVESTIGATOR)
 
 
 # ── Auth header helpers ───────────────────────────────────────────────────────

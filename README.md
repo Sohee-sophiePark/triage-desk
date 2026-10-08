@@ -1,5 +1,7 @@
 # Triage Desk
 
+**Live demo (no login, fictional data, replayed AI runs):** https://sohee-sophiepark.github.io/triage-desk/
+
 AI-augmented operations case management. Alerts from fraud, risk and compliance queues are triaged and analysed by AI agents automatically — with mandatory human-in-the-loop review before any decision is finalised.
 
 One LangGraph graph per case: code computes every number, read-only specialists analyse in parallel, a single writer
@@ -53,6 +55,7 @@ triage-desk/
       models/        # SQLAlchemy ORM models
       services/      # Business logic (workflow, data access)
     data/            # Seed scripts (seed_users.py, seed_cases.py, seed_all.py)
+    demo/            # Demo builder/exporter + recorded model responses (cassette.jsonl)
     tests/           # 177 tests — agents, API, services
     pyproject.toml   # Dependencies (uv)
     uv.lock          # Full transitive lockfile
@@ -62,6 +65,7 @@ triage-desk/
     Dockerfile       # Multi-stage: node build → nginx:alpine
     nginx.conf       # SPA routing + /api/ proxy + security headers
   docs/              # Architecture reference and dev playbook
+  .github/workflows/ # GitHub Pages: replay, build and deploy the demo
   docker-compose.yml       # Full stack: backend + frontend + postgres + redis + chromadb
   docker-compose.dev.yml   # Hot-reload override
   docker-compose.prod.yml  # Production override (replicas, resource limits)
@@ -138,6 +142,8 @@ make clean         # tear down containers and volumes
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — system layers, request lifecycle, state machine, DB entities
 - [`docs/AGENT_ARCHITECTURE.md`](docs/AGENT_ARCHITECTURE.md) — agent pipeline, evaluation methodology, human review loop
 - [`docs/PLAYBOOK_DEV.md`](docs/PLAYBOOK_DEV.md) — local dev, DB migrations, seeding, testing, Docker
+
+_Last updated 2026-10-08 · verified against the code, the 177-test suite and the live demo._
 
 ---
 

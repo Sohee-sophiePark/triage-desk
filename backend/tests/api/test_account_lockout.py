@@ -30,7 +30,7 @@ async def lockout_user(db):
     """A fresh user created specifically for lockout tests."""
     user = User(
         id=uuid.uuid4(),
-        email=f"lockout-{uuid.uuid4().hex[:8]}@test.com",
+        email=f"lockout-{uuid.uuid4().hex[:8]}@example.com",
         hashed_password=get_password_hash(LOCKOUT_PASSWORD),
         role=Role.RISK_ANALYST,
         is_active=True,
