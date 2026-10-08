@@ -91,6 +91,13 @@ export interface AIEvaluation {
   risk_assessment?: RiskAssessment;
   compliance_result?: ComplianceResult;
   evaluation?: Evaluation;
+  severity?: string;
+  flags?: { code: string; severity: string; label: string }[];
+  revisions?: number;
+  review_reason?: string;
+  brief?: { disposition: string; cited_flags: string[] } | null;
+  verdict?: { grounded: number; complete: number; disposition_justified: number; clear: number; passed: boolean } | null;
+  trace?: { node: string; kind: string; ms: number; ok: boolean; note: string; source?: string | null; model?: string | null }[];
 }
 
 export interface WorkflowCase {

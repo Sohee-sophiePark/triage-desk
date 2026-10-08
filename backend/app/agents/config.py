@@ -17,7 +17,7 @@ class AgentSettings(BaseSettings):
         "gemini/gemini-2.5-flash-lite",
     ]
     TEMPERATURE: float = 0.1
-    MAX_TOKENS: int = 2048
+    MAX_TOKENS: int = 8192      # thinking models spend part of this before the JSON answer
 
     # live = real model · record = live + append to cassette · replay = cassette only, no key needed
     LLM_MODE: Literal["live", "record", "replay"] = "live"

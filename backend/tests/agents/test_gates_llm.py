@@ -143,12 +143,12 @@ async def test_live_client_stops_on_non_fallback_error_and_raises_when_all_fail(
     from app.agents.llm import LiveClient
     tried = []
 
-    async def bad_request(model, **kw):
+    async def bad_auth(model, **kw):
         tried.append(model)
-        raise litellm.BadRequestError("bad", llm_provider="gemini", model=model)
+        raise litellm.AuthenticationError("bad key", llm_provider="gemini", model=model)
 
-    monkeypatch.setattr(litellm, "acompletion", bad_request)
-    with pytest.raises(litellm.BadRequestError):
+    monkeypatch.setattr(litellm, "acompletion", bad_auth)
+    with pytest.raises(litellm.AuthenticationError):
         await LiveClient(["gemini/a", "gemini/b"]).generate(LLMRequest(purpose="p", system="s", user="u"))
     assert tried == ["gemini/a"]
 

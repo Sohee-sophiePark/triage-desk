@@ -43,7 +43,7 @@ def _parse_json(raw: str) -> dict:
 
 # Errors that mean "this model cannot serve right now"; anything else (bad request, auth) stops the chain.
 FALLBACK_ERRORS = (litellm.RateLimitError, litellm.ServiceUnavailableError, litellm.NotFoundError,
-                   litellm.PermissionDeniedError, litellm.InternalServerError, litellm.Timeout,
+                   litellm.PermissionDeniedError, litellm.BadRequestError, litellm.InternalServerError, litellm.Timeout,
                    litellm.APIConnectionError)
 
 

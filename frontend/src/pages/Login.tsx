@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { DEMO, PERSONAS } from '../demo';
 import { ShieldAlert, Eye, EyeOff } from 'lucide-react';
 
 const Login = () => {
@@ -10,7 +11,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, switchPersona } = useAuth();
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -48,13 +49,27 @@ const Login = () => {
             Triage Desk
           </h2>
           <p className="mt-2 text-center text-sm text-neutral-400">
-            Operations case management with AI triage 
+            Operations case management with AI triage
           </p>
         </div>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-neutral-900 py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-neutral-800">
+          {DEMO ? (
+            <div className="space-y-3">
+              <p className="text-sm text-neutral-300">Choose a persona. No sign-in needed in this demo.</p>
+              {PERSONAS.map((p) => (
+                <button
+                  key={p.role}
+                  onClick={() => { switchPersona(p.role); navigate(p.home); }}
+                  className="w-full py-2 px-4 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-500"
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          ) : (
           <form className="space-y-6" onSubmit={handleLogin}>
             <div>
               <label className="block text-sm font-medium text-neutral-300">
@@ -110,6 +125,7 @@ const Login = () => {
               </button>
             </div>
           </form>
+          )}
         </div>
       </div>
     </div>

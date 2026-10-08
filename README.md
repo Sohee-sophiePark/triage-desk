@@ -108,6 +108,20 @@ npm run dev                # → http://localhost:5173 (proxies /api to :8001)
 
 Copy `.env.example` to `backend/.env` and fill in SECRET_KEY, GEMINI_API_KEY and the `SEED_*` logins before starting. No credentials live in code; the app refuses to start without its secrets.
 
+## Replay demo (no key, no login)
+
+The public demo is a static build: eight fictional alert cases run through the real case graph, the model responses are
+recorded once (`backend/demo/cassette.jsonl`, free-tier Gemini), and every API response the UI reads is exported as JSON.
+Pick a persona (Ops Supervisor, Fraud Investigator, Risk Analyst, Compliance Officer); actions are read-only.
+
+```bash
+cd backend && uv run python -m demo.export            # replay the recordings, write frontend/public/demo/
+cd ../frontend && VITE_DEMO=1 npm run build           # static site in frontend/dist
+```
+
+`uv run python -m demo.export --record` re-records the cases live (needs `GEMINI_API_KEY` in `backend/.env`).
+The Pages workflow (`.github/workflows/pages.yml`) replays, builds and deploys on every push to `main`.
+
 ## Dev commands
 
 ```bash

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
+  GitBranch,
   ChevronRight,
   Activity,
   MessageSquare,
@@ -20,6 +21,7 @@ import {
   useDecideCase,
   useEvaluateCase,
 } from '@/services/workflow';
+import { DEMO } from '../demo';
 import StatusBadge from '@/components/StatusBadge';
 
 // ── Small helpers ───────────────────────────────────────────────────────────
@@ -70,13 +72,13 @@ export default function CaseDetail() {
   const compliance = aiEval?.compliance_result;
   const evaluation = aiEval?.evaluation;
 
-  const canDecide =
+  const canDecide = !DEMO && (
     caseData?.status === 'pending_review' ||
     caseData?.status === 'in_review' ||
-    caseData?.status === 'ai_evaluated';
+    caseData?.status === 'ai_evaluated');
 
   const canEvaluate =
-    caseData?.status === 'created' || caseData?.status === 'ai_processing';
+    !DEMO && (caseData?.status === 'created' || caseData?.status === 'ai_processing');
 
   const handleDecision = async (outcome: 'approve' | 'reject' | 'escalate') => {
     if (!reasoning.trim()) {
@@ -276,6 +278,47 @@ export default function CaseDetail() {
             </SectionCard>
           )}
 
+          {/* Agent run: code-computed flags, routing, evaluator verdict and per-node trace */}
+          {aiEval?.trace && (
+            <SectionCard title="Agent Run" icon={GitBranch}>
+              <div className="flex flex-wrap gap-2 text-xs mb-4">
+                <span className="px-2 py-1 rounded bg-muted">Severity: <b>{aiEval.severity}</b></span>
+                {aiEval.brief && <span className="px-2 py-1 rounded bg-muted">Recommended: <b>{aiEval.brief.disposition.replace('_', ' ')}</b></span>}
+                <span className="px-2 py-1 rounded bg-muted">Revisions: <b>{aiEval.revisions ?? 0}</b></span>
+                {aiEval.flags?.map((f) => (
+                  <span key={f.code} title={f.label} className="px-2 py-1 rounded bg-amber-500/10 text-amber-700 dark:text-amber-300">
+                    {f.code} · {f.severity}
+                  </span>
+                ))}
+              </div>
+              {aiEval.verdict && (
+                <p className="text-xs text-muted-foreground mb-4">
+                  Evaluator: grounded {aiEval.verdict.grounded}/5 · complete {aiEval.verdict.complete}/5 ·
+                  disposition {aiEval.verdict.disposition_justified}/5 · clear {aiEval.verdict.clear}/5
+                </p>
+              )}
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-xs">
+                  <thead className="text-muted-foreground text-left">
+                    <tr><th className="py-1 pr-3">Step</th><th className="pr-3">Kind</th><th className="pr-3">OK</th><th className="pr-3">ms</th><th className="pr-3">Model</th><th>Note</th></tr>
+                  </thead>
+                  <tbody>
+                    {aiEval.trace.map((t, i) => (
+                      <tr key={i} className="border-t border-border">
+                        <td className="py-1 pr-3 font-medium text-foreground">{t.node}</td>
+                        <td className="pr-3">{t.kind}</td>
+                        <td className="pr-3">{t.ok ? '✓' : '✗'}</td>
+                        <td className="pr-3 tabular-nums">{t.ms}</td>
+                        <td className="pr-3">{t.model?.replace('gemini/', '') ?? (t.source ?? '—')}</td>
+                        <td className="text-muted-foreground">{t.note}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </SectionCard>
+          )}
+
           {/* Audit Trail */}
           <SectionCard title="Audit Trail" icon={Activity}>
             {auditLoading ? (
@@ -387,7 +430,9 @@ export default function CaseDetail() {
               </div>
             ) : (
               <p className="text-sm text-muted-foreground text-center py-6">
-                {canEvaluate
+                {DEMO
+                  ? 'Read-only demo: a reviewer approves, rejects or escalates here in the live app.'
+                  : canEvaluate
                   ? 'Run AI evaluation first to enable the decision panel.'
                   : 'This case has already been decided or is not yet ready for review.'}
               </p>

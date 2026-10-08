@@ -20,4 +20,5 @@ system_prompt: |
   OUTPUT SCHEMA:
   {"summary": "<two sentences>", "concerns": ["<concern>", ...],
    "metric_keys": ["<metric keys you relied on>"], "evidence": []}
+  evidence MUST stay an empty list: you receive no transactions. Flag codes never go in evidence.
   <<<END_SYSTEM>>>

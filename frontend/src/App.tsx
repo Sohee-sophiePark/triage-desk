@@ -29,7 +29,7 @@ const RequireRole = ({ roles, children }: { roles: string[]; children: React.Rea
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />

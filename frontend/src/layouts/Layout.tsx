@@ -15,9 +15,10 @@ import {
   Moon,
 } from 'lucide-react';
 import { useThemeStore } from '../stores/themeStore';
+import { DEMO, PERSONAS, roleLabel } from '../demo';
 
 const Layout = () => {
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user, logout, switchPersona } = useAuth();
   const location = useLocation();
   const { theme, toggleTheme } = useThemeStore();
 
@@ -101,12 +102,18 @@ const Layout = () => {
               <UserCircle className="inline-block h-8 w-8 rounded-full text-muted-foreground" />
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-foreground break-all">
-                {user?.id}
-              </p>
-              <p className="text-xs font-medium text-primary capitalize">
-                {user?.role.replace('_', ' ')}
-              </p>
+              {DEMO ? (
+                <select
+                  aria-label="Persona"
+                  value={user?.role}
+                  onChange={(e) => switchPersona(e.target.value)}
+                  className="text-sm font-medium text-foreground bg-muted border border-border rounded px-2 py-1"
+                >
+                  {PERSONAS.map((p) => <option key={p.role} value={p.role}>{p.label}</option>)}
+                </select>
+              ) : (
+                <p className="text-sm font-medium text-foreground">{roleLabel(user?.role)}</p>
+              )}
             </div>
           </div>
           <button
@@ -121,6 +128,11 @@ const Layout = () => {
 
       {/* Main Container */}
       <div className="flex-1 flex flex-col overflow-hidden">
+        {DEMO && (
+          <div role="note" className="px-4 py-2 text-xs text-center bg-amber-500/15 text-amber-800 dark:text-amber-300 border-b border-amber-500/30">
+            Demo · fictional data · AI runs replayed from recordings · read-only · not financial advice
+          </div>
+        )}
         <main className="flex-1 overflow-y-auto bg-background p-6 md:p-8">
           <Outlet />
         </main>

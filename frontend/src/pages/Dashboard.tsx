@@ -8,7 +8,6 @@ import {
 } from 'recharts';
 import {
   Users,
-  TrendingUp,
   DollarSign,
   AlertTriangle,
   Clock,
@@ -170,7 +169,6 @@ export default function Dashboard() {
     );
   }
 
-  const aumTrend = data.monthly_aum.map((d) => ({ month: d.month, v: d.aum }));
   const txTrend = data.monthly_transaction_volume.slice(-6).map((d) => ({ month: d.month, v: d.volume }));
   const caseTrend = data.monthly_cases.map((d) => ({ month: d.month, v: d.count }));
   const totalCases = Object.values(data.cases_by_type).reduce((a, b) => a + b, 0);
@@ -180,30 +178,30 @@ export default function Dashboard() {
       <div>
         <h1 className="text-2xl font-bold text-foreground tracking-tight">Overview</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Portfolio snapshot · {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+          Operations snapshot · {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
         </p>
       </div>
 
       {/* Headline KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         <KpiCard
-          label="Total AUM"
-          value={fmt(data.total_aum)}
-          icon={TrendingUp}
+          label="Incidents"
+          value={fmtNum(data.total_incidents)}
+          icon={ShieldAlert}
           color="blue"
-          trend={aumTrend}
         />
         <KpiCard
-          label="Est. Revenue"
-          value={fmt(data.estimated_revenue)}
-          sub="fee-based"
+          label="Transaction Vol."
+          value={fmt(txTrend.reduce((a, d) => a + d.v, 0))}
+          sub="last 6 months"
           icon={DollarSign}
           color="emerald"
+          trend={txTrend}
         />
         <KpiCard
-          label="Clients"
+          label="Customers"
           value={fmtNum(data.total_customers)}
-          sub={`avg score ${data.avg_credit_score}`}
+          sub={`avg credit score ${Math.round(data.avg_credit_score)}`}
           icon={Users}
           color="violet"
         />
@@ -236,13 +234,13 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <SectionCard
             title="Customers"
-            description="Client portfolio, AUM breakdown, credit health, and KYC pipeline."
+            description="Customer profiles, credit health, KYC status and transaction history."
             icon={Users}
             href="/customers"
             color="blue"
             stats={[
               { label: 'Total clients', value: fmtNum(data.total_customers) },
-              { label: 'Total AUM', value: fmt(data.total_aum) },
+              { label: 'Avg credit score', value: fmtNum(Math.round(data.avg_credit_score)) },
             ]}
           />
           <SectionCard
@@ -269,7 +267,7 @@ export default function Dashboard() {
           />
           <SectionCard
             title="Analytics"
-            description="Cross-portfolio metrics, AI pipeline quality, and workflow throughput."
+            description="AI pipeline quality, case outcomes and workflow throughput."
             icon={BarChart2}
             href="/analytics"
             color="emerald"
