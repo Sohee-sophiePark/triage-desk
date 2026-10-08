@@ -1,0 +1,105 @@
+# ── Secrets & credentials — HIGHEST PRIORITY, never commit ──────────────────
+# Any .env with any prefix/suffix/extension (incl. backups), keys, certs, tokens.
+.env
+.env*
+*.env
+*.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.crt
+*.cer
+id_rsa*
+id_ed25519*
+*.kdbx
+.netrc
+.npmrc
+.pypirc
+secrets/
+.aws/
+.ssh/
+**/credentials/**
+*credentials*.json
+*service-account*.json
+*secret*.json
+*.secret
+*.secrets
+
+# Claude Code project settings (local only)
+.claude/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+frontend/dist/
+frontend/build/
+.npm
+
+# Coverage
+htmlcov/
+.coverage
+coverage/
+*.lcov
+
+# Logs
+*.log
+logs/
+*_logs.txt
+*_logs_*.txt
+status.md
+
+# Internal docs (never commit)
+INTERNAL.md
+CLAUDE.md
+
+# Internal / sensitive documents (keep locally, never commit)
+# Only docs/ARCHITECTURE.md and docs/PLAYBOOK_DEV.md are tracked.
+docs/PRD.md
+docs/SECURITY.md
+docs/SECURITY_FRAMEWORKS.md
+docs/SPEC_PHASE1.md
+docs/CONTAINER_ARCHITECTURE.md
+docs/PLAYBOOK_UAT.md
+docs/EVAL_FRAMEWORK.md
+docs/*.docx
+*.docx
+
+temp-frontend/
+
+# Docker
+.docker/
+
+# Seed data (regenerate, don't commit large files)
+data/seed/*.db
+data/seed/*.json

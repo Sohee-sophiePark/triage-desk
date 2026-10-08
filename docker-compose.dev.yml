@@ -1,0 +1,30 @@
+# ── Dev override — hot-reload for backend and frontend ────────────────────────
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+version: "3.9"
+
+services:
+  backend:
+    build:
+      target: deps        # Use the deps stage (has uv + venv, no prod CMD)
+    command: >
+      sh -c "uv run alembic upgrade head &&
+             uv run python data/seed_all.py &&
+             uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    volumes:
+      - ./backend/app:/app/app        # Hot-reload: only app source
+      - ./backend/data:/app/data
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev      # Lightweight dev image (see below)
+    command: npm run dev -- --host 0.0.0.0
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend/src:/app/src       # Hot-reload: only source
+      - ./frontend/index.html:/app/index.html

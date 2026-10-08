@@ -1,0 +1,56 @@
+[project]
+name = "triage-desk"
+version = "0.1.0"
+description = "Triage Desk backend — AI-assisted operations case management"
+requires-python = ">=3.10"
+dependencies = [
+    # API framework
+    "fastapi>=0.115.6",
+    "uvicorn[standard]>=0.34.0",
+    "gunicorn>=21.2.0",
+    "python-multipart>=0.0.9",
+    # Database
+    "sqlalchemy>=2.0.38",
+    "alembic>=1.14.1",
+    "aiosqlite>=0.20.0",
+    "greenlet>=3.1.1",
+    # Validation & config
+    "pydantic[email]>=2.10.6",
+    "pydantic-settings>=2.7.1",
+    "python-dotenv>=1.0.1",
+    # Auth & crypto
+    "passlib[bcrypt]>=1.7.4",
+    # passlib 1.7.4 is not compatible with bcrypt>=4.1 (removed __about__ attribute)
+    "bcrypt>=4.0.1,<4.1.0",
+    "python-jose[cryptography]>=3.3.0",
+    "langgraph>=1.1.1",
+    "litellm>=1.82.1",
+    "pyyaml>=6.0.2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.4",
+    "pytest-asyncio>=0.25.3",
+    "pytest-cov>=6.0.0",
+    "httpx>=0.28.1",
+    "ruff>=0.9.0",
+    "numpy>=2.2.6",
+]
+
+[tool.uv]
+# This is an application, not an installable package.
+# uv sync installs dependencies only; pytest adds rootdir to sys.path automatically.
+package = false
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+exclude = ["venv", ".venv", "alembic"]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]

@@ -1,0 +1,75 @@
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Layout from './layouts/Layout';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import Customers from './pages/Customers';
+import CustomerDetail from './pages/CustomerDetail';
+import RiskFraud from './pages/RiskFraud';
+import Compliance from './pages/Compliance';
+import Analytics from './pages/Analytics';
+import CaseDetail from './pages/CaseDetail';
+import Admin from './pages/Admin';
+
+const ALL_ROLES = ['admin', 'risk_analyst', 'fraud_investigator', 'compliance_officer'];
+const CASE_ROLES = ['admin', 'risk_analyst', 'fraud_investigator', 'compliance_officer'];
+
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { token } = useAuth();
+  return token ? <>{children}</> : <Navigate to="/login" replace />;
+};
+
+const RequireRole = ({ roles, children }: { roles: string[]; children: React.ReactNode }) => {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" replace />;
+  if (!roles.includes(user.role)) return <Navigate to="/" replace />;
+  return <>{children}</>;
+};
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+            <Route index element={<Dashboard />} />
+            <Route
+              path="customers"
+              element={<RequireRole roles={ALL_ROLES}><Customers /></RequireRole>}
+            />
+            <Route
+              path="customers/:id"
+              element={<RequireRole roles={ALL_ROLES}><CustomerDetail /></RequireRole>}
+            />
+            <Route
+              path="risk-fraud"
+              element={<RequireRole roles={ALL_ROLES}><RiskFraud /></RequireRole>}
+            />
+            <Route
+              path="compliance"
+              element={<RequireRole roles={ALL_ROLES}><Compliance /></RequireRole>}
+            />
+            <Route
+              path="analytics"
+              element={<RequireRole roles={ALL_ROLES}><Analytics /></RequireRole>}
+            />
+            <Route
+              path="cases/:id"
+              element={<RequireRole roles={CASE_ROLES}><CaseDetail /></RequireRole>}
+            />
+            <Route
+              path="admin"
+              element={<RequireRole roles={['admin']}><Admin /></RequireRole>}
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}
+
+export default App;
