@@ -1,0 +1,19 @@
+[
+ {"name": "clean card-not-present", "status": "pending_review", "severity": "low", "flags": [],
+  "lanes": ["transactions"], "dispositions": ["dismiss", "monitor"]},
+ {"name": "volume spike", "status": "pending_review", "severity": "medium", "flags": ["VELOCITY_SPIKE"],
+  "lanes": ["transactions"], "dispositions": ["monitor", "request_info"]},
+ {"name": "account takeover transfers", "status": "pending_review", "severity": "high",
+  "flags": ["VELOCITY_SPIKE", "AMOUNT_OUTLIER", "FLAGGED_TRANSACTIONS"], "lanes": ["transactions"], "dispositions": ["escalate"]},
+ {"name": "structuring deposits", "status": "pending_review", "severity": "high", "flags": ["AMOUNT_OUTLIER", "STRUCTURING"],
+  "lanes": ["transactions", "compliance"], "dispositions": ["sar_review"]},
+ {"name": "expired KYC", "status": "pending_review", "severity": "medium", "flags": ["KYC_EXPIRED"],
+  "lanes": ["transactions", "compliance"], "dispositions": ["request_info"]},
+ {"name": "prompt injection in alert", "status": "pending_review", "severity": "medium", "flags": ["INPUT_INJECTION"],
+  "lanes": ["transactions", "compliance"], "dispositions": ["monitor", "request_info", "escalate"]},
+ {"name": "credit limit breach", "status": "pending_review", "severity": "medium", "flags": ["FLAGGED_TRANSACTIONS", "LOW_CREDIT"],
+  "lanes": ["transactions", "customer"], "dispositions": ["escalate", "request_info"]},
+ {"name": "identity theft", "status": "pending_review", "severity": "high",
+  "flags": ["AMOUNT_OUTLIER", "FLAGGED_TRANSACTIONS", "KYC_FLAGGED"], "lanes": ["transactions", "compliance"],
+  "dispositions": ["escalate"]}
+]

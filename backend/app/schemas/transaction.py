@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from app.models.transaction import TransactionChannel, TransactionStatus, TransactionType
 
@@ -25,5 +25,4 @@ class TransactionCreate(TransactionBase):
 class TransactionResponse(TransactionBase):
     id: uuid.UUID
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

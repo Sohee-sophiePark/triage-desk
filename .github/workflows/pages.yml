@@ -25,6 +25,8 @@ jobs:
         working-directory: backend
       - run: uv run python -m demo.export  # replays demo/cassette.jsonl, no API key
         working-directory: backend
+      - run: uv run python -m evals.golden  # never deploy a demo that fails the golden cases
+        working-directory: backend
       - run: npm run build --prefix frontend
         env:
           VITE_DEMO: "1"

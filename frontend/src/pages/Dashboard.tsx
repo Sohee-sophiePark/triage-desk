@@ -44,12 +44,12 @@ interface KpiCardProps {
 function KpiCard({ label, value, sub, icon: Icon, color, trend }: KpiCardProps) {
   const ct = useChartTheme();
   const colorMap: Record<string, string> = {
-    blue: 'text-blue-600 dark:text-blue-400 bg-blue-500/10',
-    emerald: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10',
-    amber: 'text-amber-600 dark:text-amber-400 bg-amber-500/10',
-    red: 'text-red-600 dark:text-red-400 bg-red-500/10',
-    violet: 'text-violet-600 dark:text-violet-400 bg-violet-500/10',
-    orange: 'text-orange-600 dark:text-orange-400 bg-orange-500/10',
+    blue: 'text-blue-700 dark:text-blue-400 bg-blue-500/10',
+    emerald: 'text-emerald-700 dark:text-emerald-400 bg-emerald-500/10',
+    amber: 'text-amber-800 dark:text-amber-400 bg-amber-500/10',
+    red: 'text-red-700 dark:text-red-400 bg-red-500/10',
+    violet: 'text-violet-700 dark:text-violet-400 bg-violet-500/10',
+    orange: 'text-orange-800 dark:text-orange-400 bg-orange-500/10',
   };
   const strokeMap: Record<string, string> = {
     blue: '#3b82f6',
@@ -116,10 +116,10 @@ interface SectionCardProps {
 function SectionCard({ title, description, icon: Icon, href, stats, color }: SectionCardProps) {
   const navigate = useNavigate();
   const colorMap: Record<string, string> = {
-    blue: 'text-blue-600 dark:text-blue-400 bg-blue-500/10 border-blue-500/20',
-    red: 'text-red-600 dark:text-red-400 bg-red-500/10 border-red-500/20',
-    violet: 'text-violet-600 dark:text-violet-400 bg-violet-500/10 border-violet-500/20',
-    emerald: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+    blue: 'text-blue-700 dark:text-blue-400 bg-blue-500/10 border-blue-500/20',
+    red: 'text-red-700 dark:text-red-400 bg-red-500/10 border-red-500/20',
+    violet: 'text-violet-700 dark:text-violet-400 bg-violet-500/10 border-violet-500/20',
+    emerald: 'text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
   };
   const cls = colorMap[color] ?? colorMap.blue;
 

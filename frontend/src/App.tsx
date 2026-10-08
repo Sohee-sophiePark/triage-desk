@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Layout from './layouts/Layout';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import Customers from './pages/Customers';
-import CustomerDetail from './pages/CustomerDetail';
-import RiskFraud from './pages/RiskFraud';
-import Compliance from './pages/Compliance';
-import Analytics from './pages/Analytics';
-import CaseDetail from './pages/CaseDetail';
-import Admin from './pages/Admin';
+
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Customers = lazy(() => import('./pages/Customers'));
+const CustomerDetail = lazy(() => import('./pages/CustomerDetail'));
+const RiskFraud = lazy(() => import('./pages/RiskFraud'));
+const Compliance = lazy(() => import('./pages/Compliance'));
+const Analytics = lazy(() => import('./pages/Analytics'));
+const CaseDetail = lazy(() => import('./pages/CaseDetail'));
+const Admin = lazy(() => import('./pages/Admin'));
 
 const ALL_ROLES = ['admin', 'risk_analyst', 'fraud_investigator', 'compliance_officer'];
 const CASE_ROLES = ['admin', 'risk_analyst', 'fraud_investigator', 'compliance_officer'];

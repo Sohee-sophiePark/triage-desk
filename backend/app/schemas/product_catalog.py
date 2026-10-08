@@ -1,7 +1,7 @@
 import uuid
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from app.models.product_catalog import CatalogCategory, ProductRiskLevel
 
@@ -21,5 +21,4 @@ class ProductCatalogCreate(ProductCatalogBase):
 class ProductCatalogResponse(ProductCatalogBase):
     id: uuid.UUID
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

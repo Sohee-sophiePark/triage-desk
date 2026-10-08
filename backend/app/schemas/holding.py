@@ -2,7 +2,7 @@ import uuid
 from datetime import date
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from app.models.holding import ProductCategory
 
@@ -22,5 +22,4 @@ class HoldingCreate(HoldingBase):
 class HoldingResponse(HoldingBase):
     id: uuid.UUID
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

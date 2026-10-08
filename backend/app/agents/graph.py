@@ -71,7 +71,7 @@ def _cfg(config: RunnableConfig, key: str):
 def _step(node: str, kind: str, t0: float, ok: bool, note: str = "", resp=None) -> dict:
     t1 = time.perf_counter()
     return {"node": node, "kind": kind, "start": round(t0, 4), "end": round(t1, 4),
-            "ms": round((t1 - t0) * 1000), "ok": ok, "note": note,
+            "ms": resp.latency_ms if resp and resp.source == "cassette" else round((t1 - t0) * 1000), "ok": ok, "note": note,
             "source": resp.source if resp else None, "model": resp.model if resp else None}
 
 
@@ -225,8 +225,7 @@ async def finalize(state: CaseState, config: RunnableConfig) -> dict:
     snapshot = {
         # fields read by the current case page
         "intent": state["lane"], "routed_agents": state["plan"],
-        "risk_assessment": {"is_fraud": bool(brief) and brief["disposition"] in ("escalate", "sar_review"),
-                            "confidence": confidence,
+        "risk_assessment": {"confidence": confidence,
                             "justification": brief["summary"] if brief else reason,
                             "evidence": brief["rationale"] if brief else []},
         "compliance_result": {"passed": not fails, "reason": "Passed all output gates." if not fails else reason,

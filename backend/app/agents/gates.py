@@ -9,6 +9,9 @@ MAX_ALERT_CHARS = 2000
 INJECTION_MARKER = "REDACTED_POTENTIAL_INJECTION"
 _PLACEHOLDER = re.compile(r"\{\{(m|t):([A-Za-z0-9_]+)\}\}")
 _PII = [re.compile(p) for p in PII_PATTERNS]
+_NUMBER_WORD = re.compile(r"\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|"
+                          r"sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|"
+                          r"hundred|thousand|million|billion|dozen|twice|percent)\b", re.IGNORECASE)
 
 
 def intake_gate(text: str | None) -> tuple[str, bool]:
@@ -25,8 +28,11 @@ def text_failures(texts: list[str], metrics: dict[str, Metric], refs: set[str], 
                 fails.append(f"unknown metric placeholder {{{{m:{key}}}}}")
             if kind == "t" and key not in refs:
                 fails.append(f"unknown evidence placeholder {{{{t:{key}}}}}")
-        if re.search(r"\d", _PLACEHOLDER.sub("", t)):
+        bare = _PLACEHOLDER.sub("", t)
+        if re.search(r"\d", bare):
             fails.append(f"raw digits outside placeholders: {t[:80]!r}")
+        if word := _NUMBER_WORD.search(bare):
+            fails.append(f"number written as a word ({word.group(0)!r}): {t[:80]!r}")
         if any(p.search(t) for p in _PII):
             fails.append("PII pattern in output")
         if check_canary_leakage(t, canary):

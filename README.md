@@ -1,5 +1,7 @@
 # Triage Desk
 
+[![ci](https://github.com/Sohee-sophiePark/triage-desk/actions/workflows/ci.yml/badge.svg)](https://github.com/Sohee-sophiePark/triage-desk/actions/workflows/ci.yml)
+
 **Live demo (no login, fictional data, replayed AI runs):** https://sohee-sophiepark.github.io/triage-desk/
 
 AI-augmented operations case management. Alerts from fraud, risk and compliance queues are triaged and analysed by AI agents automatically — with mandatory human-in-the-loop review before any decision is finalised.
@@ -56,7 +58,8 @@ triage-desk/
       services/      # Business logic (workflow, data access)
     data/            # Seed scripts (seed_users.py, seed_cases.py, seed_all.py)
     demo/            # Demo builder/exporter + recorded model responses (cassette.jsonl)
-    tests/           # 177 tests — agents, API, services
+    evals/           # Golden-case expectations for the eight demo cases
+    tests/           # 180 tests — agents, API, services
     pyproject.toml   # Dependencies (uv)
     uv.lock          # Full transitive lockfile
     Dockerfile       # Multi-stage production image
@@ -65,7 +68,7 @@ triage-desk/
     Dockerfile       # Multi-stage: node build → nginx:alpine
     nginx.conf       # SPA routing + /api/ proxy + security headers
   docs/              # Architecture reference and dev playbook
-  .github/workflows/ # GitHub Pages: replay, build and deploy the demo
+  .github/workflows/ # CI (tests, lint, evals, builds) and GitHub Pages (replay, build, deploy the demo)
   docker-compose.yml       # Full stack: backend + frontend + postgres + redis + chromadb
   docker-compose.dev.yml   # Hot-reload override
   docker-compose.prod.yml  # Production override (replicas, resource limits)
@@ -126,10 +129,22 @@ cd ../frontend && VITE_DEMO=1 npm run build           # static site in frontend/
 `uv run python -m demo.export --record` re-records the cases live (needs `GEMINI_API_KEY` in `backend/.env`).
 The Pages workflow (`.github/workflows/pages.yml`) replays, builds and deploys on every push to `main`.
 
+## Evals
+
+- **Golden cases** — `backend/evals/golden.json` states, for each of the eight demo cases, the expected status, severity,
+  exact flag set, minimum specialists, acceptable dispositions, and that every flag is cited and all gates and the evaluator
+  passed. `uv run python -m evals.golden` checks the replay export against it (8/8 pass).
+- **Adversarial cases** — scripted-model tests in `backend/tests/agents/` cover prompt injection and PII in the alert,
+  canary leakage, raw digits, number words and unknown placeholders in model output, disallowed dispositions, and evaluator failure
+  (always ends in "needs supervisor review").
+
+CI (`.github/workflows/ci.yml`) runs lint, tests, the replay export, the golden evals and both frontend builds on every
+push and pull request.
+
 ## Dev commands
 
 ```bash
-make test          # uv run pytest -x -v  (177 tests)
+make test          # uv run pytest -x -v  (180 tests)
 make lint          # uv run ruff check app/ tests/
 make migrate       # uv run alembic upgrade head (local)
 make seed          # uv run python data/seed_all.py (local, dev only)
@@ -143,7 +158,7 @@ make clean         # tear down containers and volumes
 - [`docs/AGENT_ARCHITECTURE.md`](docs/AGENT_ARCHITECTURE.md) — agent pipeline, evaluation methodology, human review loop
 - [`docs/PLAYBOOK_DEV.md`](docs/PLAYBOOK_DEV.md) — local dev, DB migrations, seeding, testing, Docker
 
-_Last updated 2026-10-08 · verified against the code, the 177-test suite and the live demo._
+_Last updated 2026-10-08 · verified against the code, the 180-test suite and the live demo._
 
 ---
 

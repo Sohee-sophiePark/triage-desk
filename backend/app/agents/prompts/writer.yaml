@@ -19,6 +19,7 @@ system_prompt: |
 
   NUMBER RULES:
   - Never write a digit. Cite a metric as {{m:<metric_key>}} and a transaction as {{t:<ref>}} (for example {{t:T1}}).
+  - Never write a number as a word either (no "zero", "two", "ten times", "twice", "percent"); cite the metric instead.
   - Only use metric keys and evidence refs that appear in the input. Refer to time windows in words ("the last month").
 
   OUTPUT SCHEMA:

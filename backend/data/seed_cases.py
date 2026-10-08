@@ -51,7 +51,6 @@ def _fake_ai_evaluation(case_type: CaseType, confidence: float) -> dict:
         "intent": f"{case_type.value}_investigation",
         "routed_agents": ["triage", case_type.value],
         "risk_assessment": {
-            "is_fraud": confidence < 60,
             "confidence": confidence,
             "justification": f"Seeded {case_type.value} case for local development.",
             "evidence": [],

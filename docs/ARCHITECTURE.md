@@ -62,4 +62,4 @@ case list or `{ "case_id", "audit_trail" }` directly.
 
 ---
 
-_Last updated 2026-10-08 · checked against the code (models, routes, workflow service) and the 177-test suite._
+_Last updated 2026-10-08 · checked against the code (models, routes, workflow service) and the 180-test suite._

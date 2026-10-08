@@ -65,7 +65,6 @@ export interface RiskIncident {
 }
 
 export interface RiskAssessment {
-  is_fraud: boolean;
   confidence: number;
   justification: string;
   evidence: string[];

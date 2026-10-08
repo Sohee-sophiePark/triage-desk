@@ -1,6 +1,6 @@
 from typing import Literal, Optional
 
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class AgentSettings(BaseSettings):
@@ -18,6 +18,7 @@ class AgentSettings(BaseSettings):
     ]
     TEMPERATURE: float = 0.1
     MAX_TOKENS: int = 8192      # thinking models spend part of this before the JSON answer
+    LLM_TIMEOUT_S: int = 60     # per call; a timeout falls back to the next model
 
     # live = real model · record = live + append to cassette · replay = cassette only, no key needed
     LLM_MODE: Literal["live", "record", "replay"] = "live"
@@ -30,9 +31,7 @@ class AgentSettings(BaseSettings):
     OPENAI_API_KEY: Optional[str] = None
     ANTHROPIC_API_KEY: Optional[str] = None
 
-    class Config:
-        env_file = ".env"
-        extra = "ignore"
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
 agent_settings = AgentSettings()

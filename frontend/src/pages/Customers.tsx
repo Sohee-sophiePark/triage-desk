@@ -292,10 +292,10 @@ export default function Customers() {
                         <span
                           className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                             c.credit_score > 700
-                              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                              ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
                               : c.credit_score > 600
-                              ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400'
-                              : 'bg-red-500/10 text-red-600 dark:text-red-400'
+                              ? 'bg-yellow-500/10 text-yellow-800 dark:text-yellow-400'
+                              : 'bg-red-500/10 text-red-700 dark:text-red-400'
                           }`}
                         >
                           {c.credit_score}

@@ -264,7 +264,7 @@ async def stream_case_evaluation(
         # Emit structured agent result events from the stored snapshot
         if ai_eval.get("risk_assessment"):
             ra = ai_eval["risk_assessment"]
-            yield f"data: {json.dumps({'event': 'investigator_complete', 'confidence': ra.get('confidence'), 'is_fraud': ra.get('is_fraud')})}\n\n"
+            yield f"data: {json.dumps({'event': 'investigator_complete', 'confidence': ra.get('confidence')})}\n\n"
 
         if ai_eval.get("compliance_result"):
             cr = ai_eval["compliance_result"]

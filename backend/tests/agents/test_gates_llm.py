@@ -1,11 +1,19 @@
 """Deterministic gates (G0/G4/G5), rendering, and the LLM boundary (cassette, scripted, PII redaction)."""
+import asyncio
 import json
 
 import pytest
 from pydantic import BaseModel, ValidationError
 
 from app.agents.gates import findings_gate, intake_gate, output_gate, render
-from app.agents.llm import CassetteClient, CassetteMiss, LLMRequest, ScriptedClient, ask
+from app.agents.llm import (
+    CassetteClient,
+    CassetteMiss,
+    LLMRequest,
+    LLMResponse,
+    ScriptedClient,
+    ask,
+)
 from app.agents.rules import Flag
 from app.agents.tools import Metric
 
@@ -37,6 +45,8 @@ def test_output_gate_passes_clean_brief():
 
 @pytest.mark.parametrize("over,needle", [
     ({"summary": "There were 30 transactions."}, "raw digits"),
+    ({"summary": "There were zero prior incidents."}, "number written as a word ('zero')"),
+    ({"rationale": ["Volume rose to Twice the baseline."]}, "number written as a word ('Twice')"),
     ({"summary": "See {{m:not_a_metric}}."}, "unknown metric placeholder"),
     ({"summary": "See {{t:T9}}."}, "unknown evidence placeholder"),
     ({"evidence": ["T9"]}, "unknown evidence ref"),
@@ -120,7 +130,7 @@ def _completion(text: str):
     return r
 
 
-async def test_live_client_falls_back_on_quota_and_records_serving_model(monkeypatch):
+async def test_live_client_falls_back_on_quota_and_records_serving_model(monkeypatch, caplog):
     import litellm
 
     from app.agents.llm import LiveClient
@@ -128,13 +138,23 @@ async def test_live_client_falls_back_on_quota_and_records_serving_model(monkeyp
 
     async def fake(model, **kw):
         tried.append(model)
+        assert kw["timeout"] == 60
         if model == "gemini/a":
             raise litellm.RateLimitError("quota", llm_provider="gemini", model=model)
+        await asyncio.sleep(0.02)
         return _completion('{"answer": "ok"}')
 
     monkeypatch.setattr(litellm, "acompletion", fake)
     resp = await LiveClient(["gemini/a", "gemini/b", "gemini/c"]).generate(LLMRequest(purpose="p", system="s", user="u"))
     assert tried == ["gemini/a", "gemini/b"] and resp.model == "gemini/b" and resp.data == {"answer": "ok"}
+    assert "gemini/a unavailable (RateLimitError)" in caplog.text
+    assert resp.latency_ms >= 20
+
+
+def test_replayed_trace_step_shows_recorded_model_latency():
+    from app.agents.graph import _step
+    resp = LLMResponse(data={}, source="cassette", model="gemini/b", latency_ms=1234)
+    assert _step("writer", "llm", 0.0, True, resp=resp)["ms"] == 1234
 
 
 async def test_live_client_stops_on_non_fallback_error_and_raises_when_all_fail(monkeypatch):

@@ -55,7 +55,7 @@ export default function CustomerDetail() {
 
   if (customerError || !customer) {
     return (
-      <div className="bg-red-900/20 border border-red-900/50 rounded-lg p-6 text-red-500">
+      <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-6 text-red-700 dark:text-red-400">
         <div className="flex items-center gap-2 mb-2">
           <AlertCircle className="w-5 h-5" />
           <h3 className="text-lg font-medium">Customer Not Found</h3>
@@ -67,10 +67,10 @@ export default function CustomerDetail() {
 
   const creditColor =
     customer.credit_score > 700
-      ? 'text-emerald-400'
+      ? 'text-emerald-700 dark:text-emerald-400'
       : customer.credit_score > 600
-      ? 'text-yellow-400'
-      : 'text-red-400';
+      ? 'text-yellow-800 dark:text-yellow-400'
+      : 'text-red-700 dark:text-red-400';
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-12">
@@ -105,7 +105,7 @@ export default function CustomerDetail() {
               onClick={() => setActiveTab(tabId)}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tabId
-                  ? 'border-blue-500 text-blue-400'
+                  ? 'border-primary text-primary'
                   : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -163,7 +163,7 @@ export default function CustomerDetail() {
                   <Td mono>{acc.account_number}</Td>
                   <Td>{capitalize(acc.account_type)}</Td>
                   <Td>
-                    <span className="font-mono text-emerald-400">
+                    <span className="font-mono text-emerald-700 dark:text-emerald-400">
                       {acc.currency} {Number(acc.balance).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </span>
                   </Td>
@@ -195,7 +195,7 @@ export default function CustomerDetail() {
                 <tr key={tx.id} className="hover:bg-muted/30 transition-colors">
                   <Td mono>{new Date(tx.timestamp).toLocaleString()}</Td>
                   <Td>
-                    <span className={`font-mono ${tx.transaction_type === 'credit' || tx.transaction_type === 'deposit' ? 'text-emerald-400' : 'text-foreground'}`}>
+                    <span className={`font-mono ${tx.transaction_type === 'credit' || tx.transaction_type === 'deposit' ? 'text-emerald-700 dark:text-emerald-400' : 'text-foreground'}`}>
                       {tx.transaction_type === 'credit' || tx.transaction_type === 'deposit' ? '+' : '-'}
                       {Number(tx.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </span>
@@ -205,7 +205,7 @@ export default function CustomerDetail() {
                   <Td>{capitalize(tx.channel)}</Td>
                   <Td>
                     {tx.risk_flag ? (
-                      <span className="inline-flex items-center gap-1 text-red-400 text-xs">
+                      <span className="inline-flex items-center gap-1 text-red-700 dark:text-red-400 text-xs">
                         <ShieldAlert className="w-3.5 h-3.5" /> Flagged
                       </span>
                     ) : (
@@ -252,7 +252,7 @@ export default function CustomerDetail() {
                 <tr key={h.id} className="hover:bg-muted/30 transition-colors">
                   <Td>{capitalize(h.product_type)}</Td>
                   <Td>
-                    <span className="font-mono text-emerald-400">
+                    <span className="font-mono text-emerald-700 dark:text-emerald-400">
                       {Number(h.current_value).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </span>
                   </Td>

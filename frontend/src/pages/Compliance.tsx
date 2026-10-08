@@ -34,15 +34,15 @@ function ChartCard({ title, children }: { title: string; children: React.ReactNo
 
 function KpiChip({ label, value, color }: { label: string; value: number; color: string }) {
   const map: Record<string, string> = {
-    violet: 'text-violet-600 dark:text-violet-400 bg-violet-500/10',
-    yellow: 'text-yellow-600 dark:text-yellow-400 bg-yellow-500/10',
-    emerald: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10',
-    orange: 'text-orange-600 dark:text-orange-400 bg-orange-500/10',
+    violet: 'text-violet-700 dark:text-violet-400 bg-violet-500/10',
+    yellow: 'text-yellow-800 dark:text-yellow-400 bg-yellow-500/10',
+    emerald: 'text-emerald-700 dark:text-emerald-400 bg-emerald-500/10',
+    orange: 'text-orange-800 dark:text-orange-400 bg-orange-500/10',
   };
   return (
     <div className={`rounded-xl p-4 ${map[color] ?? map.violet} border border-current/10`}>
       <p className="text-2xl font-bold tabular-nums">{value}</p>
-      <p className="text-xs mt-0.5 opacity-80">{label}</p>
+      <p className="text-xs mt-0.5">{label}</p>
     </div>
   );
 }

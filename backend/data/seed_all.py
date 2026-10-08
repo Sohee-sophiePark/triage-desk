@@ -8,8 +8,8 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from data.seed_users import seed_users
 from data.seed_cases import seed_cases
+from data.seed_users import seed_users
 
 
 async def main() -> None:

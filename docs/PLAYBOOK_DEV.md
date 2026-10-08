@@ -48,10 +48,13 @@ npm run dev    # → http://localhost:5173, proxies /api/ to :8001
 
 ```bash
 cd backend
-uv run pytest -x -v                     # 177 tests
+uv run pytest -x -v                     # 180 tests
 uv run ruff check app/ tests/           # lint
 uv run ruff check app/ tests/ --fix     # lint + auto-fix
 ```
+
+CI (`.github/workflows/ci.yml`, every push to `main` and every PR) runs the same checks: backend `ruff check app/ tests/ demo/ evals/`,
+`pytest`, the replay export, `python -m evals.golden`; frontend `npm run build` (tsc + Vite) in normal and demo mode. No secrets needed.
 
 ---
 
@@ -216,4 +219,4 @@ Run `make seed` (local) or `make seed-docker` to populate workflow cases.
 
 ---
 
-_Last updated 2026-10-08 · commands checked against the Makefile, routes and `demo/export.py`._
+_Last updated 2026-10-08 · commands checked against the Makefile, routes and `demo/export.py`; CI steps run locally (180 tests, both builds)._

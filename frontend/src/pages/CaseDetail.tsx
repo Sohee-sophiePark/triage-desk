@@ -54,6 +54,12 @@ function SectionCard({ title, icon: Icon, children }: { title: string; icon: Rea
   );
 }
 
+const SEVERITY_BADGE: Record<string, string> = {
+  high: 'bg-red-500/10 text-red-700 dark:text-red-400',
+  medium: 'bg-amber-500/10 text-amber-800 dark:text-amber-300',
+  low: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
+};
+
 // ── Main component ──────────────────────────────────────────────────────────
 
 export default function CaseDetail() {
@@ -197,20 +203,16 @@ export default function CaseDetail() {
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Risk Assessment
                     </p>
-                    <span
-                      className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                        risk.is_fraud
-                          ? 'bg-red-500/10 text-red-600 dark:text-red-400'
-                          : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                      }`}
-                    >
-                      {risk.is_fraud ? 'FRAUD LIKELY' : 'LOW RISK'}
-                    </span>
+                    {aiEval.severity && (
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full uppercase ${SEVERITY_BADGE[aiEval.severity] ?? ''}`}>
+                        {aiEval.severity} severity
+                      </span>
+                    )}
                   </div>
                   <p className="text-sm text-foreground leading-relaxed mb-3">{risk.justification}</p>
                   {risk.evidence.length > 0 && (
                     <div className="space-y-1.5">
-                      <p className="text-xs font-semibold text-muted-foreground">Evidence</p>
+                      <p className="text-xs font-semibold text-muted-foreground">Rationale</p>
                       {risk.evidence.map((e, i) => (
                         <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
                           <ArrowUpRight className="w-3 h-3 mt-0.5 flex-shrink-0 text-primary" />
@@ -227,9 +229,9 @@ export default function CaseDetail() {
                 <div className="border border-border rounded-lg p-4 mb-4">
                   <div className="flex items-center gap-2 mb-2">
                     {compliance.passed ? (
-                      <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      <ShieldCheck className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
                     ) : (
-                      <ShieldX className="w-4 h-4 text-red-600 dark:text-red-400" />
+                      <ShieldX className="w-4 h-4 text-red-700 dark:text-red-400" />
                     )}
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Compliance Check — {compliance.passed ? 'Passed' : 'Failed'}
@@ -239,7 +241,7 @@ export default function CaseDetail() {
                   {compliance.violations.length > 0 && (
                     <ul className="mt-2 space-y-1">
                       {compliance.violations.map((v, i) => (
-                        <li key={i} className="text-xs text-red-600 dark:text-red-400 flex items-start gap-1.5">
+                        <li key={i} className="text-xs text-red-700 dark:text-red-400 flex items-start gap-1.5">
                           <AlertCircle className="w-3 h-3 mt-0.5 flex-shrink-0" />
                           {v}
                         </li>
@@ -252,11 +254,11 @@ export default function CaseDetail() {
               {/* Hallucination flags */}
               {evaluation && evaluation.hallucination_count > 0 && (
                 <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
-                  <p className="text-xs font-semibold text-yellow-600 dark:text-yellow-400 mb-2">
+                  <p className="text-xs font-semibold text-yellow-800 dark:text-yellow-400 mb-2">
                     {evaluation.hallucination_count} Hallucination Flag{evaluation.hallucination_count > 1 ? 's' : ''} Detected
                   </p>
                   {evaluation.hallucination_flags.map((f, i) => (
-                    <p key={i} className="text-xs text-yellow-600 dark:text-yellow-400">{f}</p>
+                    <p key={i} className="text-xs text-yellow-800 dark:text-yellow-400">{f}</p>
                   ))}
                 </div>
               )}
@@ -286,7 +288,7 @@ export default function CaseDetail() {
                 {aiEval.brief && <span className="px-2 py-1 rounded bg-muted">Recommended: <b>{aiEval.brief.disposition.replace('_', ' ')}</b></span>}
                 <span className="px-2 py-1 rounded bg-muted">Revisions: <b>{aiEval.revisions ?? 0}</b></span>
                 {aiEval.flags?.map((f) => (
-                  <span key={f.code} title={f.label} className="px-2 py-1 rounded bg-amber-500/10 text-amber-700 dark:text-amber-300">
+                  <span key={f.code} title={f.label} className="px-2 py-1 rounded bg-amber-500/10 text-amber-800 dark:text-amber-300">
                     {f.code} · {f.severity}
                   </span>
                 ))}
@@ -368,7 +370,7 @@ export default function CaseDetail() {
             {caseData.human_decision ? (
               <div className="space-y-3">
                 <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-4">
-                  <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mb-1">Decision Recorded</p>
+                  <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 mb-1">Decision Recorded</p>
                   <p className="text-sm text-foreground capitalize">
                     {String(caseData.human_decision.decision ?? '')}
                   </p>
@@ -413,7 +415,7 @@ export default function CaseDetail() {
                 <button
                   onClick={() => handleDecision('escalate')}
                   disabled={decide.isPending}
-                  className="w-full bg-yellow-500/10 hover:bg-yellow-500/20 disabled:opacity-50 text-yellow-600 dark:text-yellow-400 border border-yellow-500/30 py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors text-sm"
+                  className="w-full bg-yellow-500/10 hover:bg-yellow-500/20 disabled:opacity-50 text-yellow-800 dark:text-yellow-400 border border-yellow-500/30 py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors text-sm"
                 >
                   <AlertCircle className="w-4 h-4" />
                   Escalate
@@ -422,7 +424,7 @@ export default function CaseDetail() {
                 <button
                   onClick={() => handleDecision('reject')}
                   disabled={decide.isPending}
-                  className="w-full bg-muted hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 disabled:opacity-50 text-muted-foreground py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors text-sm"
+                  className="w-full bg-muted hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-400 disabled:opacity-50 text-muted-foreground py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors text-sm"
                 >
                   <XCircle className="w-4 h-4" />
                   Reject

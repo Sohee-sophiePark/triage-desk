@@ -1,7 +1,9 @@
 """LLM boundary: one request/response shape, three clients (live, cassette, scripted), PII redaction on every call."""
 import hashlib
 import json
+import logging
 import re
+import time
 from pathlib import Path
 from typing import Callable, Literal, Protocol
 
@@ -12,6 +14,7 @@ from app.agents.config import agent_settings
 from app.agents.pii_hooks import sanitize_llm_output
 
 litellm.drop_params = True
+logger = logging.getLogger(__name__)
 
 _CANARY_LINE = re.compile(r"\n\nCANARY: .*", re.DOTALL)
 
@@ -28,6 +31,7 @@ class LLMResponse(BaseModel):
     model: str = ""
     tokens_in: int = 0
     tokens_out: int = 0
+    latency_ms: int = 0
 
 
 class LLMClient(Protocol):
@@ -55,6 +59,7 @@ class LiveClient:
 
     async def generate(self, req: LLMRequest) -> LLMResponse:
         for i, model in enumerate(self.models):
+            t0 = time.perf_counter()
             try:
                 r = await litellm.acompletion(
                     model=model,
@@ -63,11 +68,13 @@ class LiveClient:
                     max_tokens=agent_settings.MAX_TOKENS,
                     response_format={"type": "json_object"},
                     api_key=agent_settings.GEMINI_API_KEY,
+                    timeout=agent_settings.LLM_TIMEOUT_S,
                 )
                 break
-            except FALLBACK_ERRORS:
+            except FALLBACK_ERRORS as e:
                 if i == len(self.models) - 1:
                     raise
+                logger.warning("model %s unavailable (%s); falling back", model, type(e).__name__)
         usage = getattr(r, "usage", None)
         return LLMResponse(
             data=_parse_json(r.choices[0].message.content),
@@ -75,6 +82,7 @@ class LiveClient:
             model=model,
             tokens_in=getattr(usage, "prompt_tokens", 0) or 0,
             tokens_out=getattr(usage, "completion_tokens", 0) or 0,
+            latency_ms=round((time.perf_counter() - t0) * 1000),
         )
 
 

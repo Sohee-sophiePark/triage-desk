@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from app.models.risk_incident import IncidentSeverity, IncidentStatus, IncidentType
 
@@ -25,5 +25,4 @@ class RiskIncidentCreate(RiskIncidentBase):
 class RiskIncidentResponse(RiskIncidentBase):
     id: uuid.UUID
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

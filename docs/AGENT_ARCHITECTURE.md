@@ -60,7 +60,7 @@ low → `dismiss` | `monitor` | `request_info`. Agents only recommend; nothing i
 | Gate | Checks |
 |---|---|
 | G0 intake | length cap, injection phrases labelled, alert wrapped as untrusted data |
-| G4 findings | metric keys and evidence refs exist in the specialist's slice; no digits outside placeholders; no PII, canary or echoed injection |
+| G4 findings | metric keys and evidence refs exist in the specialist's slice; no digits or number words (zero … billion, twice, percent) outside placeholders; no PII, canary or echoed injection |
 | G5 guardian | same text checks on the brief; disposition allowed for the code severity; every high flag cited; only raised flags cited; evidence refs exist; rationale present |
 
 Every number a reviewer sees is filled in by `gates.render` from a code-computed metric after G5 passes.
@@ -72,7 +72,7 @@ payload, sends it, and validates the JSON against the node's Pydantic schema.
 
 | Mode (`LLM_MODE`) | Client | Use |
 |---|---|---|
-| `live` | `LiveClient` — async LiteLLM, Gemini free tier only. Tries `MODELS` newest first (3.8 Flash → … → 2.5 Flash-Lite) and moves to the next on rate-limit, quota, unavailable, access, bad-request, retired-model or timeout (60 s) errors; an auth error stops. The serving model is recorded in the trace | laptop with a key |
+| `live` | `LiveClient` — async LiteLLM, Gemini free tier only. Tries `MODELS` newest first (3.8 Flash → … → 2.5 Flash-Lite) and moves to the next on rate-limit, quota, unavailable, access, bad-request, retired-model or timeout (60 s) errors, logging a warning for each; an auth error stops. The serving model is recorded in the trace | laptop with a key |
 | `record` | `CassetteClient` wrapping live, appends to `CASSETTE_PATH` | recording demo scenarios |
 | `replay` | `CassetteClient`, recorded responses only | public demo, CI — no key |
 | tests | `ScriptedClient` — canned responses per node | unit and graph tests |
@@ -87,6 +87,7 @@ leaving room for thinking models to finish the JSON answer.
 takeover, structuring, expired KYC, alert-text injection, credit breach, identity theft) plus background customers,
 runs each through the graph, and exports every API response the UI reads as JSON. `--record` runs the cases live and
 writes `backend/demo/cassette.jsonl`; without it the export replays the cassette and fails if any recording is missing.
+Each recording keeps the serving model's latency, so the replayed trace shows real model time, not replay time.
 The Pages workflow replays, builds the frontend with `VITE_DEMO=1` and deploys.
 
 ## 5. Stored result
@@ -113,4 +114,4 @@ audit trail; no endpoint updates or deletes audit rows.
 
 ---
 
-_Last updated 2026-10-08 · checked against `backend/app/agents/` and the 177-test suite._
+_Last updated 2026-10-08 · checked against `backend/app/agents/` and the 180-test suite (timeout + fallback warning asserted)._
